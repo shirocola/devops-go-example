@@ -1,4 +1,4 @@
-module github.com/shirocola-training/devops-go-example
+module github.com/shirocola/devops-go-example
 
 go 1.18
 

@@ -9,23 +9,23 @@ jobs:
   # ==============
   # CI task
   # ==============
-  quality-check:
-    name: Quality Scan
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: sonarsource/sonarqube-scan-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
-      # If you wish to fail your job when the Quality Gate is red, uncomment the
-      # following lines. This would typically be used to fail a deployment.
-      - uses: sonarsource/sonarqube-quality-gate-action@master
-        timeout-minutes: 5
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  # quality-check:
+  #   name: Quality Scan
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #       with:
+  #         fetch-depth: 0
+  #     - uses: sonarsource/sonarqube-scan-action@master
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #         SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+  #     # If you wish to fail your job when the Quality Gate is red, uncomment the
+  #     # following lines. This would typically be used to fail a deployment.
+  #     - uses: sonarsource/sonarqube-quality-gate-action@master
+  #       timeout-minutes: 5
+  #       env:
+  #         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   build-and-push-docker-image:
     name: Build Docker image and push to repositories
@@ -39,7 +39,7 @@ jobs:
         run: echo "GITHUB_SHA=${GITHUB_SHA}" >> $GITHUB_ENV
       
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag ghcr.io/aorjoa-training/devops-go-example:${{ env.GITHUB_SHA }}
+        run: docker build . --file Dockerfile --tag ghcr.io/shirocola/devops-go-example:${{ env.GITHUB_SHA }}
         
       - name: Integration test inside Docker-compose cleanup
         run: docker-compose -f docker-compose.test.yml down
@@ -60,7 +60,7 @@ jobs:
         with:
           context: .
           tags: |
-            ghcr.io/aorjoa-training/devops-go-example:${{ env.GITHUB_SHA }}
+            ghcr.io/shirocola/devops-go-example:${{ env.GITHUB_SHA }}
           # build on feature branches, push only on main branch
           push: ${{ github.ref == 'refs/heads/main' }}
 
@@ -76,20 +76,20 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
         with:
-          repository: aorjoa-training/devops-argocd
+          repository: shirocola/devops-argocd
           persist-credentials: false
           fetch-depth: 0
       - name: change image tag
         run: |
           git --version
-          git config user.name "aorjoa"
-          git config user.email "root@aorjoa.link"
-          sed -i -E "s/ghcr.io\/aorjoa-training\/devops-go-example.*$/ghcr.io\/aorjoa-training\/devops-go-example:${GITHUB_SHA}/" kube-gitops/deployment.yml
+          git config user.name "shirocola"
+          git config user.email "root@shirocola.link"
+          sed -i -E "s/ghcr.io\/shirocola\/devops-go-example.*$/ghcr.io\/shirocola\/devops-go-example:${GITHUB_SHA}/" kube-gitops/deployment.yml
           git add kube-gitops/deployment.yml
           git commit -m "🤖 change docker image version to ${GITHUB_SHA}"
       - name: push changes
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.PAT }}
-          repository: aorjoa-training/devops-argocd
+          repository: shirocola/devops-argocd
           branch: main

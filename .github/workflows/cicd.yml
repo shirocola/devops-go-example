@@ -9,9 +9,9 @@ jobs:
   # ==============
   # CI task
   # ==============
-  quality-check:
-    name: Quality Scan
-    runs-on: ubuntu-latest
+  # quality-check:
+  #   name: Quality Scan
+  #   runs-on: ubuntu-latest
     # steps:
     #   - uses: actions/checkout@v2
     #     with:
